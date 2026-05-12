@@ -15,22 +15,29 @@ var routes = require('./routes');
 var app = express();
 
 // middleware setup
+// SMELL: [HIGH]
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // database connection
+// SMELL: [MEDIUM]
 var mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/logitrack';
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+
+    // SMELL: [MEDIUM]
     useCreateIndex: true,
+
+    // SMELL: [MEDIUM]
     useFindAndModify: false
 })
 .then(function() {
     console.log('--- DATABASE CONNECTED ---');
 })
 .catch(function(err) {
+    // SMELL: [HIGH]
     console.log('DATABASE CONNECTION ERROR:');
     console.log(err);
 });
@@ -43,12 +50,15 @@ app.get('/', function(req, res) {
     res.json({ message: 'LogiTrack Backend running' });
 });
 
+// SMELL: [MEDIUM]
 // no 404 handler here, let express handle it for now
 
 // start server
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function() {
     console.log('Server is alive on port ' + PORT);
+
+    // SMELL: [MEDIUM]
     console.log('Wait for MongoDB before testing...');
 });
 
