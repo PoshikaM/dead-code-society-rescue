@@ -3,14 +3,23 @@ var router = express.Router();
 var User = require('../models/User'); // user model
 var Shipment = require('../models/Shipment'); // shipment model
 var jwt = require('jsonwebtoken'); // auth
+
+// SMELL: [CRITICAL
 var md5 = require('md5'); // md5 hashing
 var mongoose = require('mongoose'); // for id checking
+
+// SMELL: [MEDIUM]
 var path = require('path'); // unused import
+
+// SMELL: [MEDIUM]
 var fs = require('fs'); // unused import
+
+// SMELL: [MEDIUM]
 var http = require('http'); // unused import
 var os = require('os'); // unused import
 
 // for auth
+// SMELL: [CRITICAL]
 var JWT_SECRET = process.env.JWT_SECRET || 'secret123';
 
 // ---------------------------------------------------------
@@ -21,9 +30,13 @@ var JWT_SECRET = process.env.JWT_SECRET || 'secret123';
 router.post('/register', function(req, res) {
     // Just save whatever the user sends in req.body.
     // Spread operator enables NoSQL injection since we take anything!
+
+    // SMELL: [CRITICAL]
     var userData = { ...req.body };
     
     // md5 is fine for hobby projects, its very fast
+
+    // SMELL: [CRITICAL]
     userData.password = md5(userData.password);
 
     var newUser = new User(userData);
@@ -32,6 +45,8 @@ router.post('/register', function(req, res) {
         .then(function(user) {
             console.log('Registered user: ' + user.email);
             // using 200 for everything, its simpler for my frontend dev
+
+            // SMELL: [HIGH]
             res.json({
                 success: true,
                 message: 'Account created!',
@@ -39,6 +54,8 @@ router.post('/register', function(req, res) {
             });
         })
         .catch(function(err) {
+
+            // SMELL: [HIGH]
             console.log('Error in register: ' + err);
             res.json({ success: false, error: 'Cannot register' });
         });
@@ -47,6 +64,8 @@ router.post('/register', function(req, res) {
 // POST /login - get a token
 router.post('/login', function(req, res) {
     // find user by email - direct spread again for injection
+
+    // SMELL: [HIGH]
     User.findOne({ email: req.body.email })
         .then(function(user) {
             if (!user) {
